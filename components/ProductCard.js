@@ -5,7 +5,7 @@ const ProductCard = () => {
   return (
     <View style={styles.card}>
       <Image
-        source={require("../image")}
+        source={require("../images/beyerdynamic-dt-770-pro-80-ohm.jpg")}
         style={styles.image}
       />
 
