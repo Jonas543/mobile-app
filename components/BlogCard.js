@@ -8,20 +8,20 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-const ProductCard = ({ image, name, description, price, onPress }) => {
+const BlogCard = ({
+  image,
+  name,
+  shortdescription,
+  longdescription,
+  onPress,
+}) => {
   return (
     <View style={styles.card}>
       <Image source={image} style={styles.image} />
       <Text style={styles.title}>{name}</Text>
-      <Text style={styles.description}>{description}</Text>
-      <Text style={styles.price}>${price.toFixed(2)}</Text>
-      <Button
-        style={styles.button}
-        OnPress={() => alert("Bought")}
-        title="Buy Now"
-      ></Button>
+      <Text style={styles.description}>{shortdescription}</Text>
       <TouchableOpacity style={styles.button} onPress={onPress}>
-        <Text style={styles.buttonText}>View Details</Text>
+        <Text style={styles.buttonText}>Read more</Text>
       </TouchableOpacity>
     </View>
   );
@@ -72,4 +72,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProductCard;
+export default BlogCard;
