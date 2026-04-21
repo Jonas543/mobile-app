@@ -86,7 +86,7 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Our offer</Text>
+      <Text style={styles.heading}>Our Shop</Text>
       <TextInput 
         placeholder="Search a product..." 
         style={styles.input} 
