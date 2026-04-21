@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,107 +9,130 @@ import {
   TextInput,
 } from "react-native";
 import BlogCard from "../components/BlogCard.js";
+import { useFocusEffect } from "@react-navigation/native";
+import { Picker } from "@react-native-picker/picker";
+
+const categoryNames = {
+  "": "All",
+
+  "69b0376a7459e9b475760cab": "Recording tips",
+  "69b0374e2d9b4bddafa45826": "Gear",
+  "69b0374124d44ca78ceb52a1": "Studio setup",
+};
 
 const BlogsScreen = ({ navigation }) => {
   const [isEnabled, setIsEnabled] = useState(false);
+  const [blogs, setBlogs] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState("name-asc");
+
   const toggleSwitch = () => setIsEnabled(!isEnabled);
 
+  useFocusEffect(React.useCallback(() => {}, [navigation]));
+
+  useEffect(() => {
+    fetch(
+      "https://api.webflow.com/v2/sites/699e37e5e46268361233ebf4/collections/699ef9e0d624073dc36552b9/items/",
+      {
+        headers: {
+          Authorization:
+            "Bearer fb47e70a80baa68fd5c4c95679f5d451a55a64f65274cfe7192dede29301bfee",
+        },
+      },
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        const fetchedBlogs = (data.items || []).map((item) => {
+          const fieldData = item.fieldData || {};
+          const rawImage =
+            fieldData["main-image"] ||
+            fieldData.image ||
+            fieldData.thumbnail ||
+            fieldData.heroImage;
+
+          return {
+            id: item.id,
+            title: fieldData.name || fieldData.title || "Blog",
+            description:
+              fieldData.summary ||
+              fieldData.description ||
+              fieldData.subtitle ||
+              "",
+            author: fieldData.author || "Unknown author",
+            date: fieldData.date || fieldData["publish-date"] || "",
+            body:
+              fieldData["post-body"]
+                .replace(/<[^>]+>/g, " ")
+                .replace(/\u00A0/g, " ") ||
+              fieldData.content
+                .replace(/<[^>]+>/g, " ")
+                .replace(/\u00A0/g, " ") ||
+              "",
+            image: rawImage?.url ? { uri: rawImage.url } : null,
+            category: categoryNames[fieldData.category] || "Uncategorized",
+          };
+        });
+
+        if (fetchedBlogs.length > 0) {
+          setBlogs(fetchedBlogs);
+        }
+      })
+      .catch((error) => console.error("Error fetching blogs:", error));
+  }, []);
+
+  const filteredBlogs = blogs.filter(
+    (b) =>
+      (selectedCategory === "" || b.category === selectedCategory) &&
+      b.title.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  const sortedBlogs = [...filteredBlogs].sort((a, b) => {
+    if (sortOption === "name-asc") return a.title.localeCompare(b.title);
+    if (sortOption === "name-desc") return b.title.localeCompare(a.title);
+    return 0;
+  });
+
   return (
-    <View style={styles.container}>
+ <View style={styles.container}>
       <Text style={styles.heading}>Blogs</Text>
-      <TextInput placeholder="Search a blog..." style={styles.input} />
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          marginVertical: 12,
-          justifyContent: "space-between",
-        }}
+      <TextInput
+        placeholder="Search a blog..."
+        style={styles.input}
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        placeholderTextColor="#a0a0a0"
+      />
+      <Picker
+        selectedValue={selectedCategory}
+        onValueChange={setSelectedCategory}
+        style={styles.picker}
+        dropdownIconColor="#fff"
       >
-        <Switch
-          style={styles.switch}
-          trackColor={{ false: "#767577", true: "#81b0ff" }}
-          thumbColor={isEnabled ? "#81b0ff" : "#f4f3f4"}
-          ios_backgroundColor="#3e3e3e"
-          onValueChange={toggleSwitch}
-          value={isEnabled}
-        />
-      </View>
+        <Picker.Item label="All" value="" />
+        <Picker.Item label="Gear" value="Gear" />
+        <Picker.Item label="Recording tips" value="Recording tips" />
+        <Picker.Item label="Studio setup" value="Studio setup" />
+      </Picker>
+      <Picker
+        selectedValue={sortOption}
+        onValueChange={setSortOption}
+        style={styles.picker}
+        dropdownIconColor="#fff"
+      >
+        <Picker.Item label="Name: A to Z" value="name-asc" />
+        <Picker.Item label="Name: Z to A" value="name-desc" />
+      </Picker>
       <ScrollView style={styles.container} contentContainerStyle={styles.list}>
-        <BlogCard
-          image={require("../images/beyerdynamic.jpg")}
-          name="Top 5 Skateboards for Beginners"
-          description="A roundup of the best skateboards for those just starting out."
-          onPress={() =>
-            navigation.navigate("Details", {
-              image: require("../images/beyerdynamic.jpg"),
-              title: "Top 5 Skateboards for Beginners",
-              shortDesc:
-                "A roundup of the best skateboards for those just starting out.",
-              longDesc:
-                "Choosing your first skateboard can be overwhelming. In this blog, we review the top 5 boards for beginners, covering features, price, and durability. Learn what to look for and how to avoid common mistakes when buying your first skateboard.",
-            })
-          }
-        />
-        <BlogCard
-          image={require("../images/beyerdynamic.jpg")}
-          name="How to Maintain Your Skateboard"
-          description="Tips and tricks for keeping your skateboard in top shape."
-          onPress={() =>
-            navigation.navigate("Details", {
-              image: require("../images/beyerdynamic.jpg"),
-              title: "How to Maintain Your Skateboard",
-              shortDesc:
-                "Tips and tricks for keeping your skateboard in top shape.",
-              longDesc:
-                "Proper maintenance is key to a smooth ride and long-lasting board. This blog covers cleaning, bearing care, wheel rotation, and deck protection. Discover how regular upkeep can save you money and improve your skating experience.",
-            })
-          }
-        />
-        <BlogCard
-          image={require("../images/beyerdynamic.jpg")}
-          name="Skateboarding Safety: Essential Gear"
-          description="A guide to helmets, pads, and shoes for safe skating."
-          onPress={() =>
-            navigation.navigate("Details", {
-              image: require("../images/beyerdynamic.jpg"),
-              title: "Skateboarding Safety: Essential Gear",
-              shortDesc:
-                "A guide to helmets, pads, and shoes for safe skating.",
-              longDesc:
-                "Safety should always come first. We break down the must-have gear for skateboarders, including helmet types, knee and elbow pads, and the best shoes for grip and protection. Stay safe and skate smart with these expert recommendations.",
-            })
-          }
-        />
-        <BlogCard
-          image={require("../images/beyerdynamic.jpg")}
-          name="The History of Skateboarding"
-          description="Explore the origins and evolution of skateboarding culture."
-          onPress={() =>
-            navigation.navigate("Details", {
-              image: require("../images/beyerdynamic.jpg"),
-              title: "The History of Skateboarding",
-              shortDesc:
-                "Explore the origins and evolution of skateboarding culture.",
-              longDesc:
-                "From its humble beginnings in the 1950s to the global phenomenon it is today, skateboarding has a rich history. This blog traces the sport’s evolution, key figures, and how skateboarding became a cultural icon.",
-            })
-          }
-        />
-        <BlogCard
-          image={require("../images/beyerdynamic.jpg")}
-          name="Skateboarding Tricks: Step-by-Step Guide"
-          description="Learn how to master basic and advanced tricks."
-          onPress={() =>
-            navigation.navigate("Details", {
-              image: require("../images/beyerdynamic.jpg"),
-              title: "Skateboarding Tricks: Step-by-Step Guide",
-              shortDesc: "Learn how to master basic and advanced tricks.",
-              longDesc:
-                "Ready to take your skills to the next level? This blog offers step-by-step instructions for popular tricks like ollies, kickflips, and grinds. Perfect for skaters looking to progress and impress at the skatepark.",
-            })
-          }
-        />
+        {sortedBlogs.map((blog) => (
+          <BlogCard
+            key={blog.id}
+            image={blog.image}
+            name={blog.title}
+            description={blog.description}
+            onPress={() => navigation.navigate("BlogDetail", blog)}
+          />
+        ))}
       </ScrollView>
       <StatusBar style="auto" />
     </View>
@@ -148,6 +171,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 16,
   },
+    picker: {
+    color: "#fff",
+    padding: 5,
+  }
 });
 
 export default BlogsScreen;

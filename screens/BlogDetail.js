@@ -10,15 +10,15 @@ import {
 } from "react-native";
 import ProductCard from "../components/ProductCard";
 
-const ProductDetail = ({ route }) => {
-  const { image, title, shortDesc, longDesc } = route.params;
+const ProductDetail = ({ route, navigation }) => {
+  const { image, title, body } = route.params;
 
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Details</Text>
       <Image source={image} style={styles.image} />
-      <Text style={styles.productTitle}>{title}</Text>
-      <Text style={styles.productDescription}>{longDesc}</Text>
+      <Text style={styles.blogTitle}>{title}</Text>
+      <Text style={styles.blogContent}>{body}</Text>
 
       <StatusBar style="auto" />
     </View>
@@ -48,26 +48,41 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: 300,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
   },
-  productTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#fff",
-    marginTop: 16,
+  blogTitle: {
+    fontSize: 24,
+    fontWeight: "800",
+    color: "#ffffff",
+    marginTop: 20,
     textAlign: "center",
+    paddingHorizontal: 16,
+    lineHeight: 32,
   },
-  productDescription: {
+  blogDescription: {
     fontSize: 16,
     color: "#d0d0d0",
     marginTop: 8,
     textAlign: "center",
   },
-  productPrice: {
-    fontSize: 20,
-    color: "#fff",
-    marginTop: 12,
-    fontWeight: "700",
-    textAlign: "center",
+  blogContent: {
+    fontSize: 16,
+    color: "#e0e0e0",
+    marginTop: 24,
+    marginHorizontal: 20,
+    marginBottom: 40,
+    fontWeight: "400",
+    textAlign: "left",
+    lineHeight: 28,
+    backgroundColor: "#1e1e1e",
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 3,
   },
   input: {
     marginTop: 16,

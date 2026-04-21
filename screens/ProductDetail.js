@@ -8,9 +8,8 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import ProductCard from "../components/ProductCard";
 
-const ProductDetail = ({ route }) => {
+const ProductDetail = ({ route, navigation }) => {
   const { image, title, description, price } = route.params;
 
   const [quantity, setQuantity] = useState(1);
@@ -50,7 +49,7 @@ const ProductDetail = ({ route }) => {
         style={styles.button}
         onPress={() =>
           alert(
-            `You bought ${quantity} skateboard(s) for $ ${(price * quantity).toFixed(2)}`,
+            `You bought ${quantity} Microphone(s) for $ ${(price * quantity).toFixed(2)}`,
           )
         }
       >
@@ -120,14 +119,14 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 24,
-    backgroundColor: "#ff0000",
+    backgroundColor: "#00E5FF",
     borderRadius: 10,
     paddingVertical: 12,
     marginHorizontal: 32,
     alignItems: "center",
   },
   buttonText: {
-    color: "#fff",
+    color: "#000",
     fontSize: 18,
     fontWeight: "700",
   },

@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
   card: {
     width: "48%",
     padding: 16,
-    backgroundColor: "#1c887f",
+    backgroundColor: "#2563EB",
     borderRadius: 12,
     marginBottom: 16,
   },
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 12,
-    backgroundColor: "#ff0000",
+    backgroundColor: "#00E5FF",
     color: "#fff",
     borderRadius: 10,
     paddingVertical: 10,
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: "#fff",
+    color: "#000",
     fontWeight: "700",
   },
 });

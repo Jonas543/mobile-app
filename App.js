@@ -1,3 +1,5 @@
+import React, { useState } from "react";
+
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -14,11 +16,15 @@ function HomeStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Home"
+        name="ProductsList"
         component={HomeScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="Details" component={ProductDetail} />
+      <Stack.Screen
+        name="ProductDetail"
+        component={ProductDetail}
+        options={{ tabBarStyle: { display: "none" }, headerShown: true }}
+      />
     </Stack.Navigator>
   );
 }
@@ -27,28 +33,53 @@ function BlogsStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Blogs"
+        name="BlogsList"
         component={BlogsScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="Details" component={BlogDetail} />
+      <Stack.Screen
+        name="BlogDetail"
+        component={BlogDetail}
+        options={{ tabBarStyle: { display: "none" }, headerShown: true }}
+      />
     </Stack.Navigator>
   );
 }
 
 export default function App() {
+  const [tabKey, setTabKey] = React.useState({ ProductsTab: 0, BlogsTab: 0 });
+
   return (
     <NavigationContainer>
       <Tab.Navigator>
         <Tab.Screen
-          name="Home"
-          component={HomeStack}
-          options={{ headerShown: false }}
+          name="ProductsTab"
+          options={{
+            headerShown: false,
+            unmountOnBlur: true,
+            title: "Products",
+          }}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              setTabKey((prev) => ({
+                ...prev,
+                ProductsTab: prev.ProductsTab + 1,
+              }));
+              navigation.navigate("ProductsTab", { screen: "ProductsList" });
+            },
+          })}
+          children={() => <HomeStack key={tabKey.ProductsTab} />}
         />
         <Tab.Screen
-          name="Blogs"
-          component={BlogsStack}
-          options={{ headerShown: false }}
+          name="BlogsTab"
+          options={{ headerShown: false, unmountOnBlur: true, title: "Blogs" }}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              setTabKey((prev) => ({ ...prev, BlogsTab: prev.BlogsTab + 1 }));
+              navigation.navigate("BlogsTab", { screen: "BlogsList" });
+            },
+          })}
+          children={() => <BlogsStack key={tabKey.BlogsTab} />}
         />
       </Tab.Navigator>
     </NavigationContainer>
